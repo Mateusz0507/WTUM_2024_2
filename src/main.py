@@ -74,8 +74,6 @@ class Game:
         elif np.count_nonzero(self.board == BoardFields.EMPTY.value) == 0:
             self.result = GameResult.TIE
 
-        x = 123
- 
     def check_if_player_won(self, player):
         # HORIZONTAL _
         for i in range(6):
