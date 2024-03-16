@@ -173,10 +173,9 @@ class Game:
                 else:
                     raise Exception("Invalid color value: ", self.color)
 
-                pg.draw.circle(WINDOW, color, [
-                        BOARD_LEFT_BOUNDARY + (POKE_RADIUS + GAP) + column * (2 * POKE_RADIUS + GAP),
-                        BOARD_BOTTOM_BOUNDARY - (POKE_RADIUS + GAP) - row * (2 * POKE_RADIUS + GAP),
-                    ], POKE_RADIUS)
+                x = BOARD_LEFT_BOUNDARY + (POKE_RADIUS + GAP) + column * (2 * POKE_RADIUS + GAP)
+                y = BOARD_BOTTOM_BOUNDARY - (POKE_RADIUS + GAP) - row * (2 * POKE_RADIUS + GAP)
+                pg.draw.circle(WINDOW, color, (x, y), POKE_RADIUS)
  
     def draw_puck(self, mouse_x):
         if self.turn == BoardFields.PLAYER1.value:
@@ -188,12 +187,9 @@ class Game:
 
         self.selected_column = int((mouse_x - BOARD_LEFT_BOUNDARY - GAP / 2) // (2 * POKE_RADIUS + GAP))
 
-        pg.draw.circle(WINDOW, color,
-            [
-                BOARD_LEFT_BOUNDARY + (POKE_RADIUS + GAP) + self.selected_column * (2 * POKE_RADIUS + GAP),
-                HEIGHT_ABOVE_BOARD,
-            ],
-            POKE_RADIUS)
+        x = BOARD_LEFT_BOUNDARY + (POKE_RADIUS + GAP) + self.selected_column * (2 * POKE_RADIUS + GAP)
+        y = HEIGHT_ABOVE_BOARD
+        pg.draw.circle(WINDOW, color, (x, y), POKE_RADIUS)
  
     def start(self):
         while True:
