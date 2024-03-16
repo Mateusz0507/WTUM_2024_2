@@ -228,7 +228,9 @@ class Game:
                 while True:
                     event = pg.event.wait()
  
-                    if event.type == pg.KEYDOWN:
+                    if event.type == pg.QUIT:
+                        pg.quit()
+                    elif event.type == pg.KEYDOWN:
                         if event.key == pg.K_ESCAPE:
                             pg.quit()
                         elif event.key in [pg.K_RETURN, pg.K_r]:
