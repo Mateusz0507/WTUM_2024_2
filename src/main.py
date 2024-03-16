@@ -29,8 +29,14 @@ PLAYER2_COLOR = RED
 
 
 # Constants
+LINE_OF_4 = 4
+LINE_INDEXES = LINE_OF_4 - 1
 BOARD_ROWS = 6
+FIRST_ROW_INDEX = 0
+LAST_ROW_INDEX = BOARD_ROWS - 1
 BOARD_COLUMNS = 7
+FIRST_COLUMN_INDEX = 0
+LAST_COLUMN_INDEX = BOARD_COLUMNS - 1
 GAP = POKE_RADIUS / 2
 BOARD_LEFT_BOUNDARY = WINDOW_WIDTH / 2 - (7 * POKE_RADIUS + 4 * GAP)
 BOARD_WIDTH = 14 * POKE_RADIUS + 8 * GAP
@@ -51,6 +57,7 @@ class Game:
         self.board = None
         self.result = None
         self.turn = None
+        self.last_move = None
         self.selected_column = None
         self.initialize()
 
@@ -63,6 +70,7 @@ class Game:
         for row in range(BOARD_ROWS):
             if self.board[self.selected_column, row] == BoardFields.EMPTY.value:
                 self.board[self.selected_column, row] = self.turn
+                self.last_move = (self.selected_column, row)
                 self.turn = BoardFields.PLAYER1.value if self.turn == BoardFields.PLAYER2.value else BoardFields.PLAYER2.value
                 break
  
@@ -78,45 +86,51 @@ class Game:
             self.result = GameResult.TIE
 
     def check_if_player_won(self, player):
+        if (self.last_move == None):
+            return False
+
+        column = self.last_move[0]
+        first_start_column = max(column - LINE_INDEXES, FIRST_COLUMN_INDEX)
+        last_start_column = min(column, LAST_COLUMN_INDEX - LINE_INDEXES)
+        starting_columns = [i for i in range(first_start_column, last_start_column + 1)]
+
+        row = self.last_move[1]
+        first_start_row = max(row - LINE_INDEXES, FIRST_ROW_INDEX)
+        last_start_row = min(row, LAST_ROW_INDEX - LINE_INDEXES)
+        starting_rows = [i for i in range(first_start_row, last_start_row + 1)]
+
         # HORIZONTAL _
-        for i in range(6):
-            for j in range(4):
-                if (
-                    np.count_nonzero(self.board[[j, j + 1, j + 2, j + 3], i] == player)
-                    == 4
-                ):
-                    return True
+        for i in range(len(starting_columns)):
+            line_columns = [starting_columns[i] + j for j in range(LINE_OF_4)]
+            if (np.count_nonzero(self.board[line_columns, row] == player) == LINE_OF_4):
+                return True
+
         # VERTICAL |
-        for i in range(3):
-            for j in range(7):
-                if (
-                    np.count_nonzero(self.board[j, [i, i + 1, i + 2, i + 3]] == player)
-                    == 4
-                ):
-                    return True
-        # DIAGONAL \
-        for i in range(3):
-            for j in range(4):
-                if (
-                    np.count_nonzero(
-                        self.board[[j, j + 1, j + 2, j + 3], [i, i + 1, i + 2, i + 3]]
-                        == player
-                    )
-                    == 4
-                ):
-                    return True
+        for i in range(len(starting_rows)): 
+            line_rows = [starting_rows[i] + j for j in range(LINE_OF_4)]
+            if (np.count_nonzero(self.board[column, line_rows] == player) == LINE_OF_4):
+                return True
+
         # DIAGONAL /
-        for i in range(3):
-            for j in range(3, 7):
-                if (
-                    np.count_nonzero(
-                        self.board[[j, j - 1, j - 2, j - 3], [i, i + 1, i + 2, i + 3]]
-                        == player
-                    )
-                    == 4
-                ):
-                    return True
- 
+        for i in range(min(len(starting_columns), len(starting_rows))):
+            line_columns = [starting_columns[i] + j for j in range(LINE_OF_4)]
+            line_rows = [starting_rows[i] + j for j in range(LINE_OF_4)]
+            if (np.count_nonzero(self.board[line_columns, line_rows] == player) == LINE_OF_4):
+                return True
+
+        # DIAGONAL \
+        first_start_row = max(row, FIRST_ROW_INDEX + LINE_INDEXES)
+        last_start_row = min(row + LINE_INDEXES, LAST_ROW_INDEX)
+        # Special case - check backwards
+        starting_rows = [i for i in range(first_start_row, last_start_row + 1)]
+        starting_columns = [i for i in range(last_start_column, first_start_column - 1, -1)]
+
+        for i in range(min(len(starting_columns), len(starting_rows))):
+            line_columns = [starting_columns[i] + j for j in range(LINE_OF_4)]
+            line_rows = [starting_rows[i] - j for j in range(LINE_OF_4)]
+            if (np.count_nonzero(self.board[line_columns, line_rows] == player) == LINE_OF_4):
+                return True
+            
         return False
  
     def end(self):
