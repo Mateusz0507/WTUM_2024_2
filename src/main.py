@@ -48,13 +48,16 @@ pg.display.set_caption("Connect Four")
 
 class Game:
     def __init__(self):
+        self.board = None
+        self.result = None
+        self.turn = None
+        self.selected_column = None
         self.initialize()
 
     def initialize(self):
         self.board = np.array([[BoardFields.EMPTY.value for rows in range(BOARD_ROWS)] for columns in range(BOARD_COLUMNS)], dtype="int8")
-        self.turn = BoardFields.PLAYER1.value
         self.result = GameResult.NO_RESULT
-        self.selected_column = 0 # unimportant init value
+        self.turn = BoardFields.PLAYER1.value
  
     def make_move(self):
         for row in range(BOARD_ROWS):
