@@ -1,6 +1,7 @@
 from enum import Enum
 import pygame as pg
 import numpy as np
+from pygame import gfxdraw
 from colors import *
 
 
@@ -179,8 +180,11 @@ class Game:
  
     def draw_puck(self, x, y, color):
         shadow_color = (color[0] / 2, color[1] / 2, color[2] / 2)
-        pg.draw.circle(WINDOW, shadow_color, (x, y), POKE_RADIUS)
-        pg.draw.circle(WINDOW, color, (x, y), 2/3 * POKE_RADIUS)
+        gfxdraw.aacircle(WINDOW, int(x), int(y), int(POKE_RADIUS), shadow_color)
+        gfxdraw.filled_circle(WINDOW, int(x), int(y), int(POKE_RADIUS), shadow_color)
+
+        gfxdraw.aacircle(WINDOW, int(x), int(y), int(2/3 * POKE_RADIUS), color)
+        gfxdraw.filled_circle(WINDOW, int(x), int(y), int(2/3 * POKE_RADIUS), color)
 
     def draw_puck_above_board(self, mouse_x):
         if self.turn == BoardFields.PLAYER1.value:
