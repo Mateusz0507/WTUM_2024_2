@@ -157,7 +157,7 @@ class Game:
         WINDOW.fill(BACKGROUND_COLOR)
         self.draw_board()
         if (self.is_mouse_above_board(mouse_x)):
-            self.draw_puck(mouse_x)
+            self.draw_puck_above_board(mouse_x)
         pg.display.update()
  
     def draw_board(self):
@@ -175,9 +175,14 @@ class Game:
 
                 x = BOARD_LEFT_BOUNDARY + (POKE_RADIUS + GAP) + column * (2 * POKE_RADIUS + GAP)
                 y = BOARD_BOTTOM_BOUNDARY - (POKE_RADIUS + GAP) - row * (2 * POKE_RADIUS + GAP)
-                pg.draw.circle(WINDOW, color, (x, y), POKE_RADIUS)
+                self.draw_puck(x, y, color)
  
-    def draw_puck(self, mouse_x):
+    def draw_puck(self, x, y, color):
+        shadow_color = (color[0] / 2, color[1] / 2, color[2] / 2)
+        pg.draw.circle(WINDOW, shadow_color, (x, y), POKE_RADIUS)
+        pg.draw.circle(WINDOW, color, (x, y), 2/3 * POKE_RADIUS)
+
+    def draw_puck_above_board(self, mouse_x):
         if self.turn == BoardFields.PLAYER1.value:
             color = PLAYER1_COLOR
         elif self.turn == BoardFields.PLAYER2.value:
@@ -189,7 +194,7 @@ class Game:
 
         x = BOARD_LEFT_BOUNDARY + (POKE_RADIUS + GAP) + self.selected_column * (2 * POKE_RADIUS + GAP)
         y = HEIGHT_ABOVE_BOARD
-        pg.draw.circle(WINDOW, color, (x, y), POKE_RADIUS)
+        self.draw_puck(x, y, color)
  
     def start(self):
         while True:
