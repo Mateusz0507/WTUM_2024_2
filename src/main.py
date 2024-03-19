@@ -13,17 +13,17 @@ FPS = 60
 TITLE = "Connect Four"
 
 # UI
-POKE_RADIUS = min(WINDOW_WIDTH / 20, WINDOW_HEIGHT / 20)
-GAP = POKE_RADIUS / 2
-BOARD_LEFT_BOUNDARY = WINDOW_WIDTH / 2 - (7 * POKE_RADIUS + 4 * GAP)
-BOARD_WIDTH = 14 * POKE_RADIUS + 8 * GAP
+DISC_RADIUS = min(WINDOW_WIDTH / 20, WINDOW_HEIGHT / 20)
+GAP = DISC_RADIUS / 2
+BOARD_LEFT_BOUNDARY = WINDOW_WIDTH / 2 - (7 * DISC_RADIUS + 4 * GAP)
+BOARD_WIDTH = 14 * DISC_RADIUS + 8 * GAP
 BOARD_RIGHT_BOUNDARY = BOARD_LEFT_BOUNDARY + BOARD_WIDTH
 BOARD_TOP_BOUNDARY = (
-    WINDOW_HEIGHT / 2 - (6 * POKE_RADIUS + 3.5 * GAP) + (2 * POKE_RADIUS + GAP) / 2
+    WINDOW_HEIGHT / 2 - (6 * DISC_RADIUS + 3.5 * GAP) + (2 * DISC_RADIUS + GAP) / 2
 )
-BOARD_HEIGHT = 12 * POKE_RADIUS + 7 * GAP
+BOARD_HEIGHT = 12 * DISC_RADIUS + 7 * GAP
 BOARD_BOTTOM_BOUNDARY = BOARD_TOP_BOUNDARY + BOARD_HEIGHT
-HEIGHT_ABOVE_BOARD = BOARD_TOP_BOUNDARY - (GAP + POKE_RADIUS)
+HEIGHT_ABOVE_BOARD = BOARD_TOP_BOUNDARY - (GAP + DISC_RADIUS)
 
 # Colors
 BACKGROUND_COLOR = pg.Color("black")
@@ -164,7 +164,7 @@ class Game:
             case _:
                 raise Exception("Invalid result value: ", self.result)
 
-        text = pg.font.Font(None, int(2 * POKE_RADIUS)).render(message, True, color)
+        text = pg.font.Font(None, int(2 * DISC_RADIUS)).render(message, True, color)
         text_rect = text.get_rect(center=(WINDOW_WIDTH / 2, HEIGHT_ABOVE_BOARD))
         window.blit(text, text_rect)
 
@@ -200,24 +200,24 @@ class Game:
 
                 x = int(
                     BOARD_LEFT_BOUNDARY
-                    + (POKE_RADIUS + GAP)
-                    + column * (2 * POKE_RADIUS + GAP)
+                    + (DISC_RADIUS + GAP)
+                    + column * (2 * DISC_RADIUS + GAP)
                 )
                 y = int(
                     BOARD_BOTTOM_BOUNDARY
-                    - (POKE_RADIUS + GAP)
-                    - row * (2 * POKE_RADIUS + GAP)
+                    - (DISC_RADIUS + GAP)
+                    - row * (2 * DISC_RADIUS + GAP)
                 )
                 self.draw_disc(x, y, color)
 
     def draw_disc(self, x: int, y: int, color: pg.Color):
         shadow_color = pg.Color(color[0] // 2, color[1] // 2, color[2] // 2)
 
-        gfxdraw.aacircle(window, int(x), int(y), int(POKE_RADIUS), shadow_color)
-        gfxdraw.filled_circle(window, int(x), int(y), int(POKE_RADIUS), shadow_color)
+        gfxdraw.aacircle(window, int(x), int(y), int(DISC_RADIUS), shadow_color)
+        gfxdraw.filled_circle(window, int(x), int(y), int(DISC_RADIUS), shadow_color)
 
-        gfxdraw.aacircle(window, int(x), int(y), int(2 / 3 * POKE_RADIUS), color)
-        gfxdraw.filled_circle(window, int(x), int(y), int(2 / 3 * POKE_RADIUS), color)
+        gfxdraw.aacircle(window, int(x), int(y), int(2 / 3 * DISC_RADIUS), color)
+        gfxdraw.filled_circle(window, int(x), int(y), int(2 / 3 * DISC_RADIUS), color)
 
     def draw_disc_above_board(self, mouse_x):
         match self.turn:
@@ -229,13 +229,13 @@ class Game:
                 raise Exception("Invalid turn value: ", self.turn)
 
         self.selected_column = int(
-            (mouse_x - BOARD_LEFT_BOUNDARY - GAP / 2) // (2 * POKE_RADIUS + GAP)
+            (mouse_x - BOARD_LEFT_BOUNDARY - GAP / 2) // (2 * DISC_RADIUS + GAP)
         )
 
         x = int(
             BOARD_LEFT_BOUNDARY
-            + (POKE_RADIUS + GAP)
-            + self.selected_column * (2 * POKE_RADIUS + GAP)
+            + (DISC_RADIUS + GAP)
+            + self.selected_column * (2 * DISC_RADIUS + GAP)
         )
         y = int(HEIGHT_ABOVE_BOARD)
         self.draw_disc(x, y, color)
