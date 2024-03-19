@@ -2,7 +2,6 @@ from enum import Enum
 import pygame as pg
 import numpy as np
 from pygame import gfxdraw
-from colors import *
 
 
 class BoardFields(Enum):
@@ -22,11 +21,11 @@ WINDOW_WIDTH = 1000
 WINDOW_HEIGHT = 800
 POKE_RADIUS = min(WINDOW_WIDTH / 20, WINDOW_HEIGHT / 20)
 
-BACKGROUND_COLOR = BLACK
-TEXT_COLOR = WHITE
-BOARD_COLOR = BLUE
-PLAYER1_COLOR = YELLOW
-PLAYER2_COLOR = RED
+BACKGROUND_COLOR = pg.Color("black")
+TEXT_COLOR = pg.Color("white")
+BOARD_COLOR = pg.Color("blue")
+PLAYER1_COLOR = pg.Color("black")
+PLAYER2_COLOR = pg.Color("red")
 
 
 # Constants
