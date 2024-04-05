@@ -264,10 +264,6 @@ class Game:
             self.draw(mouse_x)
             self.update_result()
 
-            if self.bot_turn == self.turn:
-                self.selected_column = get_bot_move(self.board, self.turn)
-                self.make_move()
-
             if self.result != GameResult.NO_RESULT:
                 self.show_endscreen()
 
@@ -282,6 +278,10 @@ class Game:
                         elif event.key in [pg.K_RETURN, pg.K_r]:
                             self.reset()
                             break
+
+            if self.bot_turn == self.turn:
+                self.selected_column = get_bot_move(self.board, self.turn)
+                self.make_move()
 
     def gracefully_exit(self) -> None:
         pg.display.quit()
