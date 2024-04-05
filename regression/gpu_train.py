@@ -34,5 +34,5 @@ while True:
         X_train, y_train, epochs=1, batch_size=64, validation_data=(X_test, y_test)
     )
     model.save(
-        f"models/fromdata2/{datetime.today().strftime('%Y-%m-%d_%H:%M:%S')}.keras"
+        f"models/fromdata2/{datetime.today().strftime('%Y-%m-%d_%H-%M-%S')}.keras"
     )
