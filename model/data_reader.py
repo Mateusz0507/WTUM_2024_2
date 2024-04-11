@@ -12,7 +12,7 @@ class BoardFields(Enum):
 NO_MOVE = -1000
 
 
-x = []
+boards = []
 y = []
 
 
@@ -37,7 +37,7 @@ def read_line(string):
             continue
         child_matrix = np.copy(matrix)
         child_matrix[i, indexes[i]] = turn.value
-        x.append(child_matrix)
+        boards.append(child_matrix)
         y.append(evaluations[i])
 
 
@@ -53,7 +53,5 @@ for filename in os.listdir(cwd + "/data"):
     except IOError:
         print("Error reading the file.")
 
-print(x[0])
-
-np.save(cwd + "/x.npy", x)
+np.save(cwd + "/boards.npy", boards)
 np.save(cwd + "/y.npy", y)
