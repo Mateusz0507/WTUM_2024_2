@@ -1,15 +1,10 @@
-# Connect 4
+# Connect Four
 
-## Technologie:
-python3.11
-## Narzędzia:
-- tensorflow
-- numpy (ML)
-- pygame (GUI)
-## Opis projektu:
-Gra w klasyczną wersję `Connect Four` z desktopowym GUI. Będziemy grali przeciwko algorytmowi opartemu o rozwiązania ML. Do wyboru będą dwa modele:
-1. model, w którym odpowiedzą będzie ruch 0-6 (classification model),
-2. model, w którym odpowiedzią będzie ewaluacja każdego ruchu (regression model).
+The goal of this project was to create a machine learning model capable of playing Connect Four effectively. To achieve this, we designed and implemented two approaches: a regression model to predict numerical outcomes representing the evaluation of a given position, and a classification model to select the best move among possible options by treating it as a classification problem.
 
-Danymi wejściowymi, będzie plansza gry oraz informacja o tym, kto wykonuje następny ruch. Możliwe, że do modeli zostaną dostarczone dodatkowe informacje w zależności od potrzeb.
-Dane treningowe/ewaluacyjne zostaną wygenerowane przez jeden z dostępnych silników do gry w `Connect Four`.
+## Authors
+
+- [Mateusz Tkaczyk](https://github.com/Mateusz0507)
+- [Jakub Rudnik](https://github.com/zeraye)
+- [Piotr Kurosad](https://github.com/Zekken7294)
+- [Filip Łojek](https://github.com/lojson1)
