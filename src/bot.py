@@ -18,7 +18,6 @@ class Bot:
         root = Tk()
         path = askopenfilename()
         root.destroy()
-        # self.model = tf.keras.models.load_model("regression/models/frail-consultancy/2024-04-10_18-33-43.keras")
         self.model = tf.keras.models.load_model(path)
 
     def make_move(
