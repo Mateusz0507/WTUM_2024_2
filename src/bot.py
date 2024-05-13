@@ -7,7 +7,7 @@ import numpy.typing as npt
 
 # TODO: maybe select model from GUI?
 model = tf.keras.models.load_model(
-    "regression/models/frail-consultancy/2024-04-10_18-33-43.keras"
+    "/home/lojek/WTUM_2024_2/classification/models/gruba-berta/2024-05-07_16-34-57.keras"
 )
 
 
@@ -31,7 +31,21 @@ def legal_moves(board: npt.NDArray[np.bool_]) -> list[int]:
             moves.append(i)
 
     return moves
-
+def get_bot_move_classification(board: npt.NDArray[np.int8], turn: BoardFields) -> int:
+    board = np.rot90(board, k=1)
+    new_board = np.zeros((6, 7, 2), dtype=np.bool_)
+    for col in range(len(board)):
+        for j in range(len(board[col])):
+            if board[col][j] == 1:
+                new_board[col][j][0] = True
+            if board[col][j] == 2:
+                new_board[col][j][1] = True
+    predicts = model.predict([np.array([0]),new_board[None]])
+    best_index=legal_moves(new_board)[0]
+    for col in legal_moves(new_board):
+        if(predicts[0][best_index]<predicts[0][col]):
+            best_index=col
+    return best_index
 
 def get_bot_move(board: npt.NDArray[np.int8], turn: BoardFields) -> int:
     board = np.rot90(board, k=1)
