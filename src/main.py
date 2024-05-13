@@ -3,7 +3,7 @@ import numpy as np
 import numpy.typing as npt
 import pygame as pg
 from pygame import gfxdraw
-from bot import get_bot_move
+from bot import Bot
 from enums import BoardFields, GameResult
 
 # Window
@@ -49,6 +49,7 @@ class Game:
     )
 
     def __init__(self, bot_turn: BoardFields) -> None:
+        self.bot = Bot()
         self.bot_turn: BoardFields = bot_turn
         self.reset()
 
@@ -280,7 +281,7 @@ class Game:
                             break
 
             if self.bot_turn == self.turn:
-                self.selected_column = get_bot_move(self.board, self.turn)
+                self.selected_column = self.bot.get_bot_move(self.board, self.turn)
                 self.make_move()
 
     def gracefully_exit(self) -> None:
