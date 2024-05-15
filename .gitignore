@@ -1,7 +1,6 @@
-model/data/
-model/boards.npy
-model/x.npy
-model/y.npy
+regression2/data/*.txt
+regression2/*.npy
+regression2/models/*.keras
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

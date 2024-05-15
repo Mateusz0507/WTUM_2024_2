@@ -78,8 +78,8 @@ class Bot:
               if board[col][j] == 2:
                   new_board[col][j][1] = True
       predicts = self.model.predict([np.array([0]),new_board[None]])
-      best_index=legal_moves(new_board)[0]
-      for col in legal_moves(new_board):
+      best_index = self.legal_moves(new_board)[0]
+      for col in self.legal_moves(new_board):
           if(predicts[0][best_index]<predicts[0][col]):
               best_index=col
       return best_index
