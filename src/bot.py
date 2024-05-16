@@ -1,12 +1,16 @@
 import random
 import tensorflow as tf
 from enums import BoardFields
+from convert_board import convert_board
 
 import numpy as np
 import numpy.typing as npt
 
 from tkinter.filedialog import askopenfilename
 from tkinter import *
+
+BOARD_ROWS = 6
+BOARD_COLUMNS = 7
 
 
 class Bot:
@@ -20,27 +24,42 @@ class Bot:
         root.destroy()
         self.model = tf.keras.models.load_model(path)
 
-    def make_move(
-        self, col: int, player: int, board: npt.NDArray[np.bool_]
-    ) -> npt.NDArray[np.bool_]:
-        arr = board[:, col, 0] + board[:, col, 1]
-        # numpy demand == comparator (`not arr`` will not work)
-        row = np.argmax(arr == False)  # noqa: E712
-        board[row, col, player] = True
-        return np.array(board)
-
-    def legal_moves(self, board: npt.NDArray[np.bool_]) -> list[int]:
+    def legal_moves(self, board: npt.NDArray[np.int8]) -> list[int]:
         moves = []
-
-        top_row = board[0, :, 0] + board[0, :, 1]
-        for i in range(len(top_row)):
-            # numpy demand == comparator (`not top_row[i]`` will not work)
-            if top_row[i] == False:  # noqa: E712
+        for i in range(BOARD_COLUMNS):
+            if board[i, BOARD_ROWS - 1] == BoardFields.EMPTY.value:
                 moves.append(i)
 
         return moves
-
+    
     def get_bot_move(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
+        if (self.model.layers[0].name == "regression with lines"):
+            return self.get_bot_move_regression2(board, turn)
+        else:
+            return self.get_bot_move_regression(board, turn)
+    
+
+    def get_bot_move_regression2(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
+        best_move = -1
+        best_eval = -np.Infinity
+        predicts = [-1000.0 for _ in range(7)]
+
+        for col in self.legal_moves(board):
+            changed_board = board.copy()
+            changed_board[col, BOARD_ROWS - 1] = turn.value
+
+            converted_board = convert_board(board.copy())
+            predict = self.model.predict(converted_board)
+            predicts[col] = float(predict)
+
+            if float(predict) > best_eval:
+                best_eval = float(predict)
+                best_move = col
+
+        return best_move
+
+
+    def convert_board_regression(self, board: npt.NDArray[np.int8]):
         board = np.rot90(board, k=1)
 
         new_board = np.zeros((6, 7, 2), dtype=np.bool_)
@@ -50,16 +69,20 @@ class Bot:
                     new_board[col][j][0] = True
                 if board[col][j] == 2:
                     new_board[col][j][1] = True
-
+        new_board = np.expand_dims(new_board, axis=0)
+        return [np.array([True]), new_board]
+    
+    def get_bot_move_regression(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
         best_move = -1
         best_eval = -np.Infinity
         predicts = [-1000.0 for _ in range(7)]
 
-        for col in self.legal_moves(new_board):
-            test_board = self.make_move(col, turn.value - 1, new_board)
-            test_board = np.expand_dims(test_board, axis=0)
+        for col in self.legal_moves(board):
+            changed_board = board.copy()
+            changed_board[col, BOARD_ROWS - 1] = turn.value
 
-            predict = self.model.predict([np.array([True]), test_board])
+            converted_board = self.convert_board_regression(changed_board.copy())
+            predict = self.model.predict(converted_board)
             predicts[col] = float(predict)
 
             if float(predict) > best_eval:
@@ -67,6 +90,7 @@ class Bot:
                 best_move = col
 
         return best_move
+
 
     def get_bot_move_classification(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
       board = np.rot90(board, k=1)
@@ -83,6 +107,7 @@ class Bot:
           if(predicts[0][best_index]<predicts[0][col]):
               best_index=col
       return best_index
+
 
     def get_random_move(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
         board = np.rot90(board, k=1)
