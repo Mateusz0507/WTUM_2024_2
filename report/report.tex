@@ -109,4 +109,58 @@ Pierwsze stworzone przez nas modele, miały dość mały rozmiar (około 40 tysi
 
 W trakcie rozwoju modelu opartego o planszę, jego jakość znacznie się zwiększała. Każda kolejna iteracja, czy to zmieniająca dane wejściowe, treningowe czy liczbę parametrów, poprawiała siłę analizy naszego algorytmu. Niestety te podejście spotkało się z pewnymi twardymi ograniczeniami, które okazały się dla nas przeszkodą w nalszym rozwijaniu dego podejścia. Nie byliśmy w stanie dalej polepszać jakości algorytmu mimo zastowania większej ilości danych, parametrów lub zmiany wewnętrzych ustawień (np. optymalizator, zmienna po której oceniamy jakość itd.). W końcowej wersji modelu, nie udało się nam uzyskać satysfakcjonującej siły gry. Algorytm potrafi wykonywać bardzo dobre ruchy, ale nie rozumie podstawowych zasad gry jak obronę kiedy przeciwnik ma 3 żetony w linii. Dochodzi do sytuacji, kiedy nasz model w momencie przegranej w jednym ruchu nie broni się, tylko wybiera inną kolumnę, skutującą natychmiastową przegraną. Nie tylko ma on trudności z człowiekiem, lecz również zbyt duży opór stanowi dla niego algorytm grający losowo. Zatem te podejście okazało się niepoprawne. Możliwe, że gdybyśmy zastosowali więcej danych wejściowych (np. mówiące o tym, czy przeciwnik ma wygraną w następnym ruchu), nasz algorytm uodpornił by się na ten problem. Postanowliśmy jednak spróbować rozwinąć nasze inne pomysły, które podchodzą do problemu w całkowicie inny sposób (np. bez podania planszy jako danej wejściowej).
 
+\subsection{Model klasyfikacyjny podstawowy}
+
+\subsubsection{Dane wejściowe}
+
+W podstawowej wersji modelu klasyfikacyjnego postanowiliśmy jako daną wejściową podać tak samo jak w modelu 2.1 planszę, zapisaną w postaci trójwymiarowej macierzy o rozmiarze (6,7,2), której szczegóły objaśnione są w sekcji 2.1.1. Oprócz reprezentacji planszy podajemy zmienną typu bool określającą kto wykonuje teraz ruch.
+
+\subsubsection{Wielkość danych treningowych i testowych}
+
+Dogenerowaliśmy w międzyczasie około 2 milionów danych testowych, co z wcześniejszymi danymi daje niespełna 25 milionów plansz i ich ewaluacje. Trenowanie odbywało się na losowo wybranych rekordach z tychże danych, dzięki czemu czas trenowania był dużo krótszy a jakość treningów nie spadała znacząco w stosunku do trenowania na pełnych zestawach danych. Mimo wszystko do samego testowania postanowiliśmy użyć wszystkich danych jakie mieliśmy aby otrzymane wyniki testów były jak najbardziej miarodajne.
+
+\subsubsection{Rozmiar modelu w kontekście siły gry}
+
+Początkowo model był małych rozmiarów, lecz w miarę eksperymentowania z dodatkowymi powłokami, ze zwiększaniem ilości neuronów w kolejnych powłokach rozmiar znacznie się zwiększył. Końcowo model zajmuje około 230MB co przekłada się na trochę powyżej 60 milionów parametrów. Przy próbie dalszego zwiększania różnych parametrów modelu nie odnotowaliśmy widocznej poprawy dlatego uznaliśmy obecny model za końcowy.
+
+\subsubsection{Realna siła gry}
+
+Model został poddany treningowi tak długo jak długo rosła dokładność jego odpowiedzi. Dokładność tą badaliśmy za pomocą funkcji bibliotecznej "mean squared error", która liczy średnią kwadratów błędów między odpowiedzią bota, a wynikiem spodziewanym. W pewnym momencie dalsze iteracje nie powodowały poprawy dokładności, a czasem nawet ta dokładność zaczęła maleć więc skończyliśmy trenowanie. Model ten okazał się najlepiej działającym spośród wszystkich stworzonych przez nas modeli. Początkowe ruchy wykonuje on książkowo - dokładnie tak jak to było podane w zbiorze treningowym. W dalszym toku rozgrywki gra całkiem dobrze, zdecydowanie możemy stwierdzić że potrafiłby ograć każdy z pozostałych modeli. Jednak ma ten sam problem co inne modele, nie jest w stanie wykryć tego, że przeciwnik ma już na planszy 3 dyski i często oddaje w ten sposób wygraną przeciwnikowi. Aby tą słabość zniwelować stworzyliśmy model z sekcji 2.4.
+
+\subsection{Model klasyfikacyjny wersja 0-1}
+
+\subsubsection{Dane wejściowe}
+
+Jest to kolejny model klasyfikacyjny, który tak samo jak model 2.2 przyjmuje jako parametry wejściowe macierz o rozmiarze (6,7,2) reprezentującą planszę oraz zmienną wskazującą gracza, który obecnie się rusza. Różnica w porównaniu do poprzedniego modelu polega na formacie danych treningowych. Zamiast podawać dla każdego ruchu ewaluację mającą postać różnych liczb całkowitych zawęziliśmy się do zbioru {0,1}. Oznacza to, że jeśli dany ruch jest najlepszym ruchem w danej sytuacji to jego ewaluacja wynosi 1, w przeciwnym przypadku jego ewaluacja to 0. Należy pamiętać, że najlepszych ruchów może być kilka zatem nie wyklucza to występowania kilku jedynek w tej ewaluacji.
+
+\subsubsection{Wielkość danych treningowych i testowych}
+
+Podczas tworzenia i trenowania tego modelu nie mieliśmy wygenerowanych najnowszych 2 milionów rekordów danych. Trenowanie to zatem odbywało się na pierwszych około 22 milionach danych. Postanowiliśmy sprawdzić, czy zamiast wybierać losowe dane z naszego dużego zbioru, przetrenowanie modelu na całym zestawie danych polepszy końcowe wyniki. Wobec tego zarówno trenowanie, jak i testowanie tego modelu korzystało z całego zbioru 22 milionów rekordów.
+
+\subsubsection{Rozmiar modelu w kontekście siły gry}
+
+Model ten jest wyjątkowo małych rozmiarów, ma niespełna 800 tysięcy parametrów. Tak mały rozmiar spowodowany jest bardzo wczesnym zastojem w zwiększaniu się dokładności w miarę zwiększania ilości parametrów modelu. Wyjątkowo w tym modelu zamiast funkcji "mean squared error" zastosowaliśmy funkcję "binary crossentropy" co wynika z zerojedynkowości ewaluacji danych treningowych.
+
+\subsubsection{Realna siła gry}
+
+Mimo tego, że trenowaliśmy ten model na całym zbiorze danych treningowych, co jest równoważne z tym że każda iteracja trenowania trwała dłużej niż zwykle to postanowiliśmy konsekwentnie trenować model tak długo, jak długo wartości określające dokładność odpowiedzi będą maleć nawet wtedy gdy już były to bardzo drobne różnice. Ostatecznie model gra nieco ponadprzeciętnie ale popełnia podstawowe błędy. Na pierwsze ruchy nie wybiera środkowej kolumny co jest już poważnym błędem, poza tym nie jest w stanie wykryć tego, że przeciwnik ma już ułożone 3 dyski w rzędzie ale jak już pisaliśmy jest to problem, z którym borykają się wszystkie dotychczas stworzone modele. Uważamy, że działa on lepiej niż gracz wybierający kolumnę losowo, lecz pokonanie tego modelu nie jest dużym wyzwaniem dla człowieka myślącego.
+
+\subsection{Model klasyfikacyjny z dodatkową tablicą czwórek}
+
+\subsubsection{Dane wejściowe}
+
+Tak jak wszystkie poprzednie modele jako dane wejściowe przyjmowane są: macierz o rozmiarze (6,7,2) reprezentująca planszę oraz zmienna mówiąca do kogo należy następny ruch. W końcu aby zapobiec łatwemu podkładaniu zwycięstw przeciwnikowi, postanowiliśmy w ostatnim modelu klasyfikacyjnym jako dodatkowy parametr wejściowy dać tablicę, która będzie wskazywać ile każdy z graczy ma ułożonych dysków w danej czwórce. Dokładniej, plansza o wymiarach (6,7) zawiera w sobie 69 możliwych czwórek jakie można ułożyć - jest to suma wszystkich czwórek poziomych, pionowych i skośnych. Tablica czwórek ma zatem 69 elementów, każdy odpowiada jednej wygrywającej czwórce jaką można ułożyć na planszy. Tablica przyjmuje wartości całkowite od -3 do 3. Gdzie 0 występuje w przypadku gdy każdy z graczy ma co najmniej jeden dysk ułożony w danej czwórce(tam już nikt nie wygra) lub w przypadku gdy czwórka jest pusta. Wartości -3,-2,-1 oznaczają kolejno trzy, dwa, jeden dysk ułożony w danej czwórce przez przeciwnika, podczas gdy pozostałe komórki w czwórce są puste. Wartości 3,2,1 analogicznie tylko oznaczają przewagę grającego.
+
+\subsubsection{Wielkość danych treningowych i testowych}
+
+Ponownie chcąc otrzymać możliwie jak najbardziej dokładne wyniki postanowiliśmy trenować ten model na podstawie całego zbioru danych testowych. Mieliśmy już wtedy dostęp do nowo wygenerowanych danych, co daje w sumie około 24 milionów rekordów. Testowanie również odbywało się przy użyciu całego zbioru danych.
+
+\subsubsection{Rozmiar modelu w kontekście siły gry}
+
+Stworzenie modelu wymagało przetworzenia dodatkowej tabeli wejściowej, stąd od razu rozmiar modelu był spory - nieco ponad milion parametrów. Sukcesywnie dodawaliśmy kolejne warstwy do modelu, które zwiększały dokładność jego odpowiedzi. W chwili gdy dodawanie kolejnych parametrów do modelu nie dawało lepszych wyników, zaprzestaliśmy dalszego zwiększania modelu. Otrzymaliśmy model mający prawie 10 milionów parametrów, co zważywszy na dodatkową tabelę wejściową może nie wydawać się dużym rozmiarem.
+
+\subsubsection{Realna siła gry}
+
+W przypadku tego modelu upłynęła wyjątkowo duża ilość iteracji trenowania zanim przestał on zmniejszać wartości funkcji testującej - "mean squared error". Niestety nie uzyskaliśmy lepszych wyników niż w modelu klasycznym podstawowym, który różni się tylko tym, że nie podajemy na wejściu tablicy czwórek. Być może wystąpiło zjawisko przeuczenia(overfitting), czyli sytuacja, w której model z dużą liczbą parametrów zbyt dokładnie zapamiętuje szczegóły treningowe. Model wtedy działa dobrze na danych treningowych, ale jego wydajność spada na danych testowych lub produkcyjnych, ponieważ nauczy się specyficznych wzorców w danych treningowych zamiast generalnych zależności. Innym powodem niskiej efektywności modelu może być niewłaściwe zaprojektowanie sieci neuronowej, przez którą przechodzą dane wejściowe. Bot potrafi robić dobre ruchy, jednak daleko tutaj od jakiejś reguły, czasami sprawia wrażenie jakby grał losowo.
+
 \end{document}
