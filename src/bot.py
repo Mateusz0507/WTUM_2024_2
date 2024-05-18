@@ -108,6 +108,24 @@ class Bot:
           if(predicts[0][best_index]<predicts[0][col]):
               best_index=col
       return best_index
+    
+    def get_bot_move_classification2(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
+        board = np.rot90(board, k=1)
+
+        new_board = np.zeros((6, 7, 2), dtype=np.bool_)
+        for col in range(len(board)):
+            for j in range(len(board[col])):
+                if board[col][j] == 1:
+                    new_board[col][j][0] = True
+                if board[col][j] == 2:
+                    new_board[col][j][1] = True
+        fours_matrix = generate_output_matrix(new_board)
+        predicts = self.model.predict([np.array([0]),new_board[None],fours_matrix[None]])
+        best_index=self.legal_moves(new_board)[0]
+        for col in self.legal_moves(new_board):
+            if(predicts[0][best_index]<predicts[0][col]):
+                best_index=col
+        return best_index
 
 
     def get_random_move(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
@@ -122,3 +140,58 @@ class Bot:
                     new_board[col][j][1] = True
 
         return random.choice(self.legal_moves(new_board))
+
+def calculate_line_score(line):
+    player1_count = np.sum(line[:,0] == True)  # Count of Player 1's disks
+    player2_count = np.sum(line[:,1] == True)  # Count of Player 2's disks
+
+    if player2_count == 3 and player1_count == 0:
+        return -3
+    elif player2_count == 2 and player1_count == 0:
+        return -2
+    elif player2_count == 1 and player1_count == 0:
+        return -1
+    elif player1_count > 0 and player2_count > 0:
+        return 0
+    elif player2_count == 0 and player1_count == 1:
+        return 1
+    elif player2_count == 0 and player1_count == 2:
+        return 2
+    elif player2_count == 0 and player1_count == 3:
+        return 3
+    else:
+        return 0
+
+def generate_output_matrix(board):
+    rows, cols, _ = board.shape
+    output_matrix = np.zeros((69, 1), dtype=np.int8)
+    k=0
+    # Check horizontal lines
+    for i in range(rows):
+        for j in range(cols - 3):
+            line = board[i, j:j+4, :]
+            index = k
+            k=k+1
+            output_matrix[index] = calculate_line_score(line)
+    # Check vertical lines
+    for i in range(rows - 3):
+        for j in range(cols):
+            line = board[i:i+4, j, :]
+            index = k
+            k=k+1
+            output_matrix[index] = calculate_line_score(line)
+    # Check diagonal lines (\)
+    for i in range(rows - 3):
+        for j in range(cols - 3):
+            line = board[i:i+4, j:j+4, :]
+            index = k
+            k=k+1
+            output_matrix[index] = calculate_line_score(line.diagonal().transpose())
+    # Check diagonal lines (/)
+    for i in range(rows - 3):
+        for j in range(3, cols):
+            line = board[i:i+4, j-3:j+1, :]
+            index = k
+            k=k+1
+            output_matrix[index] = calculate_line_score(np.fliplr(line).diagonal().transpose())
+    return output_matrix
