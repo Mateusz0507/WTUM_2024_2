@@ -49,7 +49,8 @@ class Bot:
             changed_board[col, BOARD_ROWS - 1] = turn.value
 
             converted_board = convert_board(board.copy())
-            predict = self.model.predict(converted_board)
+            input = [np.array([converted_board[0]]), np.array([converted_board[1]]), np.array([converted_board[2]])]
+            predict = self.model.predict(input)
             predicts[col] = float(predict)
 
             if float(predict) > best_eval:
