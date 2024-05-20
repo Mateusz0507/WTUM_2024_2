@@ -33,11 +33,8 @@ class Bot:
         return moves
     
     def get_bot_move(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
-        if (self.model.layers[0].name == "regression: board and lines"):
-            print("regression: board and lines")
-            return self.get_bot_move_regression2(board, turn)
-        elif (self.model.layers[0].name == "regression: lines"):
-            print("regression: lines")
+        if (self.model.layers[0].name in ["regression: board and lines", "regression: lines", "regression: proof of concept"]):
+            print("REGRESSION@")
             return self.get_bot_move_regression2(board, turn)
         else:
             return self.get_bot_move_regression(board, turn)
@@ -55,10 +52,16 @@ class Bot:
             changed_board[col, row] = turn.value
             converted_board = convert_board(changed_board.copy())
 
-            input = [np.array([converted_board[0]]), np.array([converted_board[1]]), np.array([converted_board[2]])]
-            if (self.model.layers[0].name == "regression: lines"):
-                input = [np.array([converted_board[1]]), np.array([converted_board[2]])]
-            
+            match self.model.layers[0].name:
+                case "regression: board and lines":
+                    input = [np.array([converted_board[0]]), np.array([converted_board[1]]), np.array([converted_board[2]])]
+                case "regression: lines":
+                    input = [np.array([converted_board[1]]), np.array([converted_board[2]])]
+                case "regression: proof of concept":
+                    input = [np.array([converted_board[1]]), np.array([converted_board[2]])]
+                case _:
+                    raise Exception("Invalid model type: ", self.model.layers[0].name)
+
             predict = self.model.predict(input)
 
             # TODO: Remove
