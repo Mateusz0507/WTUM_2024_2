@@ -34,8 +34,10 @@ class Bot:
     
     def get_bot_move(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
         if (self.model.layers[0].name == "regression: board and lines"):
+            print("regression: board and lines")
             return self.get_bot_move_regression2(board, turn)
         elif (self.model.layers[0].name == "regression: lines"):
+            print("regression: lines")
             return self.get_bot_move_regression2(board, turn)
         else:
             return self.get_bot_move_regression(board, turn)
