@@ -45,7 +45,8 @@ def convert_board(board):
     board_reshaped[0, :, :] = (board == BoardFields.PLAYER1.value)
     board_reshaped[1, :, :] = (board == BoardFields.PLAYER2.value)
 
-    # Result is set of two arrays (for player and opponent) that counts number of lines of 1, 2 and 3
+    # Result are two arrays (one for each player)
+    # Array counts number of possible winning lines of four for a player where he already has 1/2/3/4 discs
     player_lines = [0, 0, 0, 0]
     opponent_lines = [0, 0, 0, 0]
 
