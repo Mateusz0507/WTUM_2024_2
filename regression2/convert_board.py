@@ -45,9 +45,10 @@ def convert_board(board):
     board_reshaped[0, :, :] = (board == BoardFields.PLAYER1.value)
     board_reshaped[1, :, :] = (board == BoardFields.PLAYER2.value)
 
-    # Result is set of two arrays (for player and opponent) that counts number of lines of 1, 2 and 3
-    player_lines = [0, 0, 0]
-    opponent_lines = [0, 0, 0]
+    # Result are two arrays (one for each player)
+    # Array counts number of possible winning lines of four for a player where he already has 1/2/3/4 discs
+    player_lines = [0, 0, 0, 0]
+    opponent_lines = [0, 0, 0, 0]
 
     indexes_of_every_line_of_4 = every_line_of_4()
 
@@ -57,13 +58,13 @@ def convert_board(board):
         # For player
         if BoardFields.PLAYER2.value not in line_of_4:
             number_of_discs = np.sum(line_of_4 == BoardFields.PLAYER1.value)
-            if 0 < number_of_discs < 4:
+            if 0 < number_of_discs:
                 player_lines[number_of_discs - 1] += 1
 
         # For oponent
         if BoardFields.PLAYER1.value not in line_of_4:
             number_of_discs = np.sum(line_of_4 == BoardFields.PLAYER2.value)
-            if 0 < number_of_discs < 4:
+            if 0 < number_of_discs:
                 opponent_lines[number_of_discs - 1] += 1
     
     result = [board_reshaped, player_lines, opponent_lines]

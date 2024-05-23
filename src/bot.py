@@ -33,7 +33,7 @@ class Bot:
         return moves
     
     def get_bot_move(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
-        if (self.model.layers[0].name == "regression with lines"):
+        if (self.model.layers[0].name in ["regression: board and lines", "regression: lines", "regression: proof of concept"]):
             return self.get_bot_move_regression2(board, turn)
         else:
             return self.get_bot_move_regression(board, turn)
@@ -41,21 +41,33 @@ class Bot:
 
     def get_bot_move_regression2(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
         best_move = -1
-        best_eval = -np.Infinity
+        best_eval = np.Infinity
         predicts = [-1000.0 for _ in range(7)]
 
         for col in self.legal_moves(board):
             changed_board = board.copy()
-            changed_board[col, BOARD_ROWS - 1] = turn.value
+            board_column = changed_board[col]
+            row = (np.where(board_column == BoardFields.EMPTY.value)[0])[0]
+            changed_board[col, row] = turn.value
+            converted_board = convert_board(changed_board.copy())
 
-            converted_board = convert_board(board.copy())
-            input = [np.array([converted_board[0]]), np.array([converted_board[1]]), np.array([converted_board[2]])]
+            match self.model.layers[0].name:
+                case "regression: board and lines":
+                    input = [np.array([converted_board[0]]), np.array([converted_board[1]]), np.array([converted_board[2]])]
+                case "regression: lines":
+                    input = [np.array([converted_board[1]]), np.array([converted_board[2]])]
+                case "regression: proof of concept":
+                    input = [np.array([converted_board[1]]), np.array([converted_board[2]])]
+                case _:
+                    raise Exception("Invalid model type: ", self.model.layers[0].name)
+
             predict = self.model.predict(input)
             predicts[col] = float(predict)
-
-            if float(predict) > best_eval:
+            if float(predict) < best_eval:
                 best_eval = float(predict)
                 best_move = col
+
+        print(predicts)
 
         return best_move
 
@@ -75,7 +87,7 @@ class Bot:
     
     def get_bot_move_regression(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
         best_move = -1
-        best_eval = -np.Infinity
+        best_eval = np.Infinity
         predicts = [-1000.0 for _ in range(7)]
 
         for col in self.legal_moves(board):
@@ -86,7 +98,7 @@ class Bot:
             predict = self.model.predict(converted_board)
             predicts[col] = float(predict)
 
-            if float(predict) > best_eval:
+            if float(predict) < best_eval:
                 best_eval = float(predict)
                 best_move = col
 

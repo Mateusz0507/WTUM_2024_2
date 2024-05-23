@@ -1,6 +1,7 @@
 regression2/data/*.txt
 regression2/*.npy
 regression2/models/*.keras
+regression2/models/*/*.keras
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
