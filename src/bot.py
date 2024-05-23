@@ -34,7 +34,6 @@ class Bot:
     
     def get_bot_move(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
         if (self.model.layers[0].name in ["regression: board and lines", "regression: lines", "regression: proof of concept"]):
-            print("REGRESSION@")
             return self.get_bot_move_regression2(board, turn)
         else:
             return self.get_bot_move_regression(board, turn)
@@ -63,12 +62,7 @@ class Bot:
                     raise Exception("Invalid model type: ", self.model.layers[0].name)
 
             predict = self.model.predict(input)
-
-            # TODO: Remove
-            #predict = converted_board[1][1] + 10 * converted_board[1][2] - converted_board[2][1] - 10 * converted_board[2][2]
-
             predicts[col] = float(predict)
-
             if float(predict) < best_eval:
                 best_eval = float(predict)
                 best_move = col
@@ -93,7 +87,7 @@ class Bot:
     
     def get_bot_move_regression(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
         best_move = -1
-        best_eval = -np.Infinity
+        best_eval = np.Infinity
         predicts = [-1000.0 for _ in range(7)]
 
         for col in self.legal_moves(board):
@@ -104,7 +98,7 @@ class Bot:
             predict = self.model.predict(converted_board)
             predicts[col] = float(predict)
 
-            if float(predict) > best_eval:
+            if float(predict) < best_eval:
                 best_eval = float(predict)
                 best_move = col
 
