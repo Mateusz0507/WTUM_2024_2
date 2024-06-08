@@ -83,37 +83,106 @@ Przy każdym z tych sposobów, każda wygenerowana pozycja ma przypisaną ewalua
 
 \subsubsection{Dane wejściowe}
 
-Początkowa próba stworzenia modelu regresywnego opierała się na jednej danej wejściowej. Była to macierz o rozmiarach (6, 7, 2) składająca się z wartości logicznych. Reprezentowała ona jednoznacznie planszę do gry w \textit{Conenct Four}. Wymiary (6, 7) odpowiadają wymiarą planszy, a dodatkowy wymiar o wielkości 2, skorelowany jest z danym graczem. Jeżeli krążek pierwszego gracza znajduje się na planszy to w macierzy będzie symbolizowany jako wartość prawdziwa. Analogicznie dla drugiego gracza pamiętając, że żetony pierwszego gracza znajdują się w zerowej warstie, a drugiego w kolejnej.
+Początkowa próba stworzenia modelu regresywnego opierała się na jednej danej wejściowej. Była to macierz o rozmiarach (6, 7, 2) składająca się z wartości logicznych. Reprezentowała ona jednoznacznie planszę do gry w \textit{Conenct Four}. Wymiary (6, 7) odpowiadają wymiary planszy, a dodatkowy wymiar o wielkości 2, skorelowany jest z danym graczem. Jeżeli krążek pierwszego gracza znajduje się na planszy to w macierzy będzie symbolizowany jako wartość prawdziwa. Analogicznie dla drugiego gracza pamiętając, że żetony pierwszego gracza znajdują się w zerowej warstwie, a drugiego w kolejnej.
 
 \begin{figure}[!ht]
     \centering
     \includegraphics[scale=0.40]{board.png}
-    \caption{Wizualna reprezentacja macierzy planszy, gdzie pierwszy gracz wykonał jedenyny ruch na 6 kolumnie.}
+    \caption{Wizualna reprezentacja macierzy planszy, gdzie pierwszy gracz wykonał jedyny ruch na 6 kolumnie.}
 \end{figure}
 
-W trakcie pracy nad modelem zdaliśmy sobie sprawę, że istotną informacją jaką należałoby dodać jest zmienna mówiąca, który gracz wykona ruch najbliższy ruch. Dla człowieka (lub innego rodzaju algorytmu) taka informacja może okazać się zbędna, ponieważ przy poprawnym tworzeniu planszy parzystość żetonów definiuje osobę, która wykonuje następny ruch. Jeżeli liczba jest nieparzysta pierwszy gracz musiał wykonać więcej ruchów, zatem następny powinien ruszyć się drugi gracz. W przeciwnym wypadku rusza się gracz pierwszy.
+W trakcie pracy nad modelem zdaliśmy sobie sprawę, że istotną informacją jaką należałoby dodać jest zmienna mówiąca, który gracz wykona najbliższy ruch. Dla człowieka (lub innego rodzaju algorytmu) taka informacja może okazać się zbędna, ponieważ przy poprawnym tworzeniu planszy parzystość żetonów definiuje osobę, która wykonuje następny ruch. Jeżeli liczba jest nieparzysta pierwszy gracz musiał wykonać więcej ruchów, zatem następny powinien ruszyć się drugi gracz. W przeciwnym wypadku rusza się gracz pierwszy.
 
 Zatem końcowo model jako dane wejściowe posiadał macierz o rozmiarach (6, 7, 2) jednoznacznie reprezentującą planszę oraz zmienną określającą gracza, który wykonuje ruch.
 
 \subsubsection{Wielkość danych treningowych i testowych}
 
-Podczas tworzenia modeli, do naszej dyspozycji było około 22 milionów plansz wraz z ich ewaluacjami. Jednak trenowanie na wszystkich dostępnych danych szybko okazał się nieefektywnym sposobem tworzenia modeli. Wielkość modelu, zmienną po której ocenaliśmy jego jakość i inne jego parametry zmienialiśmy w sposób dynamiczny analizując jakość uzyskanego algorytmu. Dzięki trenowaniu przy użyciu mniejszej ilości danych (około 100 tysięcy) byliśmy w stanie dostosowywać i zmieniać paramety modelu w znacznie szybszy sposób.
+Podczas tworzenia modeli, do naszej dyspozycji było około 22 milionów plansz wraz z ich ewaluacjami. Jednak trenowanie na wszystkich dostępnych danych szybko okazał się nieefektywnym sposobem tworzenia modeli. Wielkość modelu, zmienną po której ocenialiśmy jego jakość i inne jego parametry zmienialiśmy w sposób dynamiczny analizując jakość uzyskanego algorytmu. Dzięki trenowaniu przy użyciu mniejszej ilości danych (około 100 tysięcy) byliśmy w stanie dostosowywać i zmieniać paramenty modelu w znacznie szybszy sposób.
 
-Do testowania modelu podeszliśmy w sposób bardziej kompleksowy. Zależało nam, aby wynik ewaluacji jakości modelu w jak najlepszy spsób odpowiadał jego rzeczywistej sile gry. Dlatego przy testowaniu każdego modelu używaliśmy wszystkich danych jakie mieliśmy do dyspozcji. Nawet jeżeli dany model był trenowany na mniejszej ilości danych, jego końcowa ewaluacja odbywała się na całym zbiorze.
+Do testowania modelu podeszliśmy w sposób bardziej kompleksowy. Zależało nam, aby wynik ewaluacji jakości modelu w jak najlepszy sposób odpowiadał jego rzeczywistej sile gry. Dlatego przy testowaniu każdego modelu używaliśmy wszystkich danych jakie mieliśmy do dyspozycji. Nawet jeżeli dany model był trenowany na mniejszej ilości danych, jego końcowa ewaluacja odbywała się na całym zbiorze.
 
 \subsubsection{Rozmiar modelu w kontekście siły gry}
 
-Pierwsze stworzone przez nas modele, miały dość mały rozmiar (około 40 tysięcy parametrów). W pewnym momencie, kolejne iteracje nie poprawiały jakości modelu. Kiedy pojawiał się taki problem, analizowaliśmy czy model nie potrzebuje innych danych wejściowych lub zmiany zbioru danych trenigowo-testowych. Następnie zwiększaliśmy liczbę jego parametrów. Taka zmiana poprawiała ewaluację danego modelu, nie tylko statystycznie, lecz również rosła realna siła gry algorytmu. Ostateczy model posiada około 84 milionów paramterów. Możliwym jest, że taka liczba parametrów przerasta liczbę stopni swobody gry w \textit{Connect Four}, ciężko jednak mówić o stopniach swobody, kiedy analizujemy teorie gier. Trudno jest stwierdzić, kiedy rozmiar modelu jest zbyt duży i zwiększanie go, nie przynosi realnych korzyści. Wówczas algorytm dopasowywuje się do danych jakimi go posiłkujemy, a nie do realnych zasad gry.
+Pierwsze stworzone przez nas modele, miały dość mały rozmiar (około 40 tysięcy parametrów). W pewnym momencie, kolejne iteracje nie poprawiały jakości modelu. Kiedy pojawiał się taki problem, analizowaliśmy czy model nie potrzebuje innych danych wejściowych lub zmiany zbioru danych treningowo-testowych. Następnie zwiększaliśmy liczbę jego parametrów. Taka zmiana poprawiała ewaluację danego modelu, nie tylko statystycznie, lecz również rosła realna siła gry algorytmu. Ostateczny model posiada około 84 milionów parametrów. Możliwym jest, że taka liczba parametrów przerasta liczbę stopni swobody gry w \textit{Connect Four}, ciężko jednak mówić o stopniach swobody, kiedy analizujemy teorie gier. Trudno jest stwierdzić, kiedy rozmiar modelu jest zbyt duży i zwiększanie go, nie przynosi realnych korzyści. Wówczas algorytm dopasowuje się do danych jakimi go posiłkujemy, a nie do realnych zasad gry.
 
 \subsubsection{Realna siła gry}
 
-W trakcie rozwoju modelu opartego o planszę, jego jakość znacznie się zwiększała. Każda kolejna iteracja, czy to zmieniająca dane wejściowe, treningowe czy liczbę parametrów, poprawiała siłę analizy naszego algorytmu. Niestety te podejście spotkało się z pewnymi twardymi ograniczeniami, które okazały się dla nas przeszkodą w nalszym rozwijaniu dego podejścia. Nie byliśmy w stanie dalej polepszać jakości algorytmu mimo zastowania większej ilości danych, parametrów lub zmiany wewnętrzych ustawień (np. optymalizator, zmienna po której oceniamy jakość itd.). W końcowej wersji modelu, nie udało się nam uzyskać satysfakcjonującej siły gry. Algorytm potrafi wykonywać bardzo dobre ruchy, ale nie rozumie podstawowych zasad gry jak obronę kiedy przeciwnik ma 3 żetony w linii. Dochodzi do sytuacji, kiedy nasz model w momencie przegranej w jednym ruchu nie broni się, tylko wybiera inną kolumnę, skutującą natychmiastową przegraną. Nie tylko ma on trudności z człowiekiem, lecz również zbyt duży opór stanowi dla niego algorytm grający losowo. Zatem te podejście okazało się niepoprawne. Możliwe, że gdybyśmy zastosowali więcej danych wejściowych (np. mówiące o tym, czy przeciwnik ma wygraną w następnym ruchu), nasz algorytm uodpornił by się na ten problem. Postanowliśmy jednak spróbować rozwinąć nasze inne pomysły, które podchodzą do problemu w całkowicie inny sposób (np. bez podania planszy jako danej wejściowej).
+W trakcie rozwoju modelu opartego o planszę, jego jakość znacznie się zwiększała. Każda kolejna iteracja, czy to zmieniająca dane wejściowe, treningowe czy liczbę parametrów, poprawiała siłę analizy naszego algorytmu. Niestety te podejście spotkało się z pewnymi twardymi ograniczeniami, które okazały się dla nas przeszkodą w dalszym rozwijaniu tego podejścia. Nie byliśmy w stanie dalej polepszać jakości algorytmu mimo zastosowania większej ilości danych, parametrów lub zmiany wewnętrznych ustawień (np. optymalizator, zmienna po której oceniamy jakość itd.). W końcowej wersji modelu, nie udało się nam uzyskać satysfakcjonującej siły gry. Algorytm potrafi wykonywać bardzo dobre ruchy, ale nie rozumie podstawowych zasad gry jak obronę kiedy przeciwnik ma 3 żetony w linii. Dochodzi do sytuacji, kiedy nasz model w momencie przegranej w jednym ruchu nie broni się, tylko wybiera inną kolumnę, skutkującą natychmiastową przegraną. Nie tylko ma on trudności z człowiekiem, lecz również zbyt duży opór stanowi dla niego algorytm grający losowo. Zatem te podejście okazało się niepoprawne. Możliwe, że gdybyśmy zastosowali więcej danych wejściowych (np. mówiące o tym, czy przeciwnik ma wygraną w następnym ruchu), nasz algorytm uodpornił by się na ten problem. Postanowiliśmy jednak spróbować rozwinąć nasze inne pomysły, które podchodzą do problemu w całkowicie inny sposób (np. bez podania planszy jako danej wejściowej).
+
+\clearpage
+
+\subsection{Model regresywny z planszą oraz liniami jako danymi wejściowymi}
+
+\subsubsection{Koncepcja linii}
+Głównym celem w grze jest połączenie czterech krążków w linię, dlatego dobrze gdybyśmy przekazywali w danych wejściowych do modelu informacje związane z tą koncepcją. Na planszy można stworzyć 69 różnych linii o czterech polach. Zamysłem jest, aby policzyć ile dany gracz ma możliwych linii, na których w przyszłości mógłby ustawić zwycięską linię czterech krążków. Dla każdego z dwóch graczy tablica $[a_1, a_2, a_3, a_4]$ będzie zliczała ilość takich możliwych linii, gdzie pole $a_n$ określa, ile jest linii, w których znajduje się już $n$ krążków zawodnika. Z oczywistych względów w pozostałych miejscach linii znajduje się $4 - n$ pustych pól (nie może znaleźć się tu żaden krążek przeciwnika, ponieważ wtedy nie dałoby się stworzyć tu zwycięskiej linii czterech krążków).
+\\ \\
+Przykładowo dla takiej pozycji:
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[scale=0.40]{example.png}
+    \caption{Przykładowa pozycja na planszy po 3 ruchach.}
+\end{figure}
+
+\noindent Dla gracza z żółtymi krążkami tablica linii będzie wynosiła $[4, 1, 0, 0]$, ponieważ posiada jedną potencjalną linię z dwoma krążkami, a reszta to linie z jednym krążkiem. Z kolei dla gracza o czerwonych krążkach tablica wynosi $[6, 0, 0, 0]$. Należy pamiętać, że możliwe są aż trzy potencjalne linie w poziomie z tym krążkiem.
+
+\subsubsection{Dane wejściowe}
+
+Dane wejściowe modelu to plansza, zapisana w takiej samej postaci jak wcześniej opisana. Dodatkowo przekazywane są dwie tablice o rozmiarze (4, 1) - tablica linii dla gracza pierwszego oraz tablica linii dla gracza drugiego.
+
+\subsubsection{Wielkość danych treningowych i testowych}
+
+Niestety przy takich danych wejściowych nie można było przekazywać do modelu jedynie pozycji, ale należało przekształcić te dane zliczając ilość linii. Koszty takie operacji są duże, ponieważ każdy z krążków należy do wielu potencjalnych linii. Przez to zmniejszyliśmy ilość dostarczanych danych podczas trenowania.
+
+\subsubsection{Realna siła gry}
+Niestety podejście to również nie przyniosło spodziewanego rezultatu. Model mimo dodatkowej informacji zawartej tablicach odnośnie linii nie wykazał znacznej poprawy w porównaniu do modelu bez linii. Model zdaje się wykonywać losowe ruchy. Nie broni się także blokując linię przeciwnika,  w której ma już on trzy krążki swojego koloru.
+
+\subsection{Model regresywny tylko z liniami jako dane wejściowe}
+
+\subsubsection{Dane wejściowe}
+
+Być może modelowi, który jako argumenty wejściowe miał podawaną zarówno planszę jak i linie, ciężko było zinterpretować dodatkowe parametry w postaci linii, skoro miał już przekazywaną całą pozycję. W tym podejściu zrezygnowaliśmy z przekazywania pozycji, wybierając na dane wejściowe jedynie tablice linii dla obydwu graczy. Model nie miał przez to pełnej informacji jaka była pozycja na planszy, jednak linie przekazywały dużo informacji w kontekście zasad gry. Model na podstawie trenowania powinien wywnioskować, że im więcej własnych potencjalnych linii w pozycji, tym lepiej powinien ją oceniać.
+
+\subsubsection{Wielkość danych treningowych i testowych}
+
+Wielkości danych, ale także sposób trenowania były analogiczne jak w przypadku poprzedniego modelu, z danymi wejściowymi pozycji i tablicami linii.
+
+\subsubsection{Realna siła gry}
+To podejście okazało się również niewystarczające. Model zachowywał się podobnie do poprzedniego. Z perspektywy człowieka wykonywał on losowe ruchy. Nie bronił się także przed przegraną. To zapoczątkowało wątpliwości, czy tablice linii są odpowiednim rodzajem danych przekazywanych do modelu. Mówią one jedynie, ile jest linii, nie biorąc pod uwagę ich jakości. Przykładowo w danej pozycji może nastąpić takie ustawienie, że gdy przeciwnik zablokuje nam jedną z linii, to otworzy nam to możliwość na dostawienie własnego krążka do kolejnej linii - być może zwycięskiej. Ze względu na takie wątpliwość powstał kolejny model, który nie był już przeznaczony do gry, ale jako zbadanie czy podejście tablicy linii ma jakikolwiek sens.
+
+\subsection{Model regresywny tylko z liniami - eksperyment}
+
+Jak opisano w poprzednim akapicie, zastosowanie tablic linii jako danych wejściowych wzbudziło wątpliwości. Dlatego został stworzony prosty model, który przyjmuje dwie tablice linii, dla każdego z graczy. Warstwa ta jest bezpośrednio połączona z wyjściem, dlatego model posiada tylko 9 parametrów - 8 wag połączeń oraz bias.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[scale=0.40]{parameters.png}
+    \caption{Wizualizacja parametrów modelu eksperymentalnego - 8 wag połączeń oraz bias.}
+\end{figure}
+
+\noindent Jeżeli przeanalizujemy zasady gry, powinniśmy mieć pewne oczekiwania w stosunku do wartości tych parametrów:
+
+\begin{itemize}
+    \item Każdy z graczy wygrywa poprzez te same zasady, dlatego wartość \textit{bias}-u nie powinna faworyzować żadnego z graczy. Dodatkowo wartości linii o danej ilości własnych krążków powinny być takie same dla obu graczy.
+    \item Tablica z wartościami $a_n$ odpowiada za linie gracza pierwszego (żółte krążki), który ma za zadanie maksymalizować wynik. Analogicznie tablica druga z wartościami $b_n$ odpowiada za gracza drugiego (czerwone krążki), który minimalizuje wynik,
+    \item Linia, w której gracz posiada więcej własnych krążków powinna być lepsza od tej, w której jest ich mniej. Jest to dosyć oczywista zasada, ponieważ jesteśmy wtedy bliżej od zwycięstwa.
+\end{itemize}
+
+\noindent Oznacza to, że wartości parametrów powinny mieć następujące własności:
+
+\begin{itemize}
+    \item \textit{bias} = 0,
+    \item $|a_n| = |b_n|$
+    \item $a_n > 0$, $b_n < 0$,
+    \item $|a_4| > |a_3| > |a_2| > |a_1|$, $|b_4| > |b_3| > |b_2| > |b_1|$,
+\end{itemize}
+
+\noindent Niestety po treningu modelu wartości jego parametrów były dalekie od oczekiwanych, co może sugerować, że ilość potencjalnych linii do zwycięstwa nie jest jednoznacznym wyznacznikiem oceny, jak dobra jest dana pozycja.
 
 \subsection{Model klasyfikacyjny podstawowy}
 
 \subsubsection{Dane wejściowe}
 
-W podstawowej wersji modelu klasyfikacyjnego postanowiliśmy jako daną wejściową podać tak samo jak w modelu 2.1 planszę, zapisaną w postaci trójwymiarowej macierzy o rozmiarze (6,7,2), której szczegóły objaśnione są w sekcji 2.1.1. Oprócz reprezentacji planszy podajemy zmienną typu bool określającą kto wykonuje teraz ruch.
+W podstawowej wersji modelu klasyfikacyjnego postanowiliśmy jako daną wejściową podać tak samo jak w modelu 2.1 planszę, zapisaną w postaci trójwymiarowej macierzy o rozmiarze (6,7,2), której szczegóły objaśnione są w sekcji 2.1.1. Oprócz reprezentacji planszy podajemy zmienną typu boolowski określającą kto wykonuje teraz ruch.
 
 \subsubsection{Wielkość danych treningowych i testowych}
 
@@ -139,7 +208,7 @@ Podczas tworzenia i trenowania tego modelu nie mieliśmy wygenerowanych najnowsz
 
 \subsubsection{Rozmiar modelu w kontekście siły gry}
 
-Model ten jest wyjątkowo małych rozmiarów, ma niespełna 800 tysięcy parametrów. Tak mały rozmiar spowodowany jest bardzo wczesnym zastojem w zwiększaniu się dokładności w miarę zwiększania ilości parametrów modelu. Wyjątkowo w tym modelu zamiast funkcji "mean squared error" zastosowaliśmy funkcję "binary crossentropy" co wynika z zerojedynkowości ewaluacji danych treningowych.
+Model ten jest wyjątkowo małych rozmiarów, ma niespełna 800 tysięcy parametrów. Tak mały rozmiar spowodowany jest bardzo wczesnym zastojem w zwiększaniu się dokładności w miarę zwiększania ilości parametrów modelu. Wyjątkowo w tym modelu zamiast funkcji "mean squared error" zastosowaliśmy funkcję "binary crossentropy" co wynika z zero-jedynkowości ewaluacji danych treningowych.
 
 \subsubsection{Realna siła gry}
 
@@ -161,6 +230,7 @@ Stworzenie modelu wymagało przetworzenia dodatkowej tabeli wejściowej, stąd o
 
 \subsubsection{Realna siła gry}
 
-W przypadku tego modelu upłynęła wyjątkowo duża ilość iteracji trenowania zanim przestał on zmniejszać wartości funkcji testującej - "mean squared error". Niestety nie uzyskaliśmy lepszych wyników niż w modelu klasycznym podstawowym, który różni się tylko tym, że nie podajemy na wejściu tablicy czwórek. Być może wystąpiło zjawisko przeuczenia(overfitting), czyli sytuacja, w której model z dużą liczbą parametrów zbyt dokładnie zapamiętuje szczegóły treningowe. Model wtedy działa dobrze na danych treningowych, ale jego wydajność spada na danych testowych lub produkcyjnych, ponieważ nauczy się specyficznych wzorców w danych treningowych zamiast generalnych zależności. Innym powodem niskiej efektywności modelu może być niewłaściwe zaprojektowanie sieci neuronowej, przez którą przechodzą dane wejściowe. Bot potrafi robić dobre ruchy, jednak daleko tutaj od jakiejś reguły, czasami sprawia wrażenie jakby grał losowo.
+W przypadku tego modelu upłynęła wyjątkowo duża ilość iteracji trenowania zanim przestał on zmniejszać wartości funkcji testującej - "mean squared error". Niestety nie uzyskaliśmy lepszych wyników niż w modelu klasycznym podstawowym, który różni się tylko tym, że nie podajemy na wejściu tablicy czwórek. Być może wystąpiło zjawisko przeuczenia (overfitting), czyli sytuacja, w której model z dużą liczbą parametrów zbyt dokładnie zapamiętuje szczegóły treningowe. Model wtedy działa dobrze na danych treningowych, ale jego wydajność spada na danych testowych lub produkcyjnych, ponieważ nauczy się specyficznych wzorców w danych treningowych zamiast generalnych zależności. Innym powodem niskiej efektywności modelu może być niewłaściwe zaprojektowanie sieci neuronowej, przez którą przechodzą dane wejściowe. Bot potrafi robić dobre ruchy, jednak daleko tutaj od jakiejś reguły, czasami sprawia wrażenie jakby grał losowo.
 
 \end{document}
+
