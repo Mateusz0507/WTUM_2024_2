@@ -2,6 +2,10 @@
 
 The goal of this project was to create a machine learning model capable of playing Connect Four effectively. To achieve this, we designed and implemented two approaches: a regression model to predict numerical outcomes representing the evaluation of a given position, and a classification model to select the best move among possible options by treating it as a classification problem.
 
+## Models
+
+[Link](https://drive.google.com/drive/folders/1q3JHONAxRItecoQ6i5aR-O7R6aEytl6b?usp=sharing) to our models.
+
 ## Instalation
 
 You need to install:
