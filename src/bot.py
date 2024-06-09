@@ -24,6 +24,7 @@ class Bot:
         root.destroy()
         self.model = tf.keras.models.load_model(path)
 
+
     def legal_moves(self, board: npt.NDArray[np.int8]) -> list[int]:
         moves = []
         for i in range(BOARD_COLUMNS):
@@ -33,10 +34,14 @@ class Bot:
         return moves
     
     def get_bot_move(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
-        if (self.model.layers[0].name in ["regression: board and lines", "regression: lines", "regression: proof of concept"]):
-            return self.get_bot_move_regression2(board, turn)
-        else:
+        if (self.model.name == "frail"):
             return self.get_bot_move_regression(board, turn)
+        elif (self.model.layers[0].name == "fours_input"):
+            return self.get_bot_move_classification2(board, turn)
+        elif (self.model.name == "gruba-berta" or self.model.name == "model4_1"):
+            return self.get_bot_move_classification(board, turn)
+        else:
+            return self.get_bot_move_regression2(board, turn)
     
 
     def get_bot_move_regression2(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
@@ -87,7 +92,7 @@ class Bot:
     
     def get_bot_move_regression(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
         best_move = -1
-        best_eval = np.Infinity
+        best_eval = -np.Infinity
         predicts = [-1000.0 for _ in range(7)]
 
         for col in self.legal_moves(board):
@@ -98,7 +103,7 @@ class Bot:
             predict = self.model.predict(converted_board)
             predicts[col] = float(predict)
 
-            if float(predict) < best_eval:
+            if float(predict) > best_eval:
                 best_eval = float(predict)
                 best_move = col
 
@@ -106,39 +111,52 @@ class Bot:
 
 
     def get_bot_move_classification(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
-      board = np.rot90(board, k=1)
-      new_board = np.zeros((6, 7, 2), dtype=np.bool_)
-      for col in range(len(board)):
-          for j in range(len(board[col])):
-              if board[col][j] == 1:
-                  new_board[col][j][0] = True
-              if board[col][j] == 2:
-                  new_board[col][j][1] = True
-      predicts = self.model.predict([np.array([0]),new_board[None]])
-      best_index = self.legal_moves(new_board)[0]
-      for col in self.legal_moves(new_board):
-          if(predicts[0][best_index]<predicts[0][col]):
-              best_index=col
-      return best_index
-    
-    def get_bot_move_classification2(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
-        board = np.rot90(board, k=1)
+        rotated_board = np.rot90(board, k=1)
 
         new_board = np.zeros((6, 7, 2), dtype=np.bool_)
-        for col in range(len(board)):
-            for j in range(len(board[col])):
-                if board[col][j] == 1:
+        for col in range(len(rotated_board)):
+            for j in range(len(rotated_board[col])):
+                if rotated_board[col][j] == 1:
                     new_board[col][j][0] = True
-                if board[col][j] == 2:
+                if rotated_board[col][j] == 2:
                     new_board[col][j][1] = True
-        fours_matrix = generate_output_matrix(new_board)
-        predicts = self.model.predict([np.array([0]),new_board[None],fours_matrix[None]])
-        best_index=self.legal_moves(new_board)[0]
-        for col in self.legal_moves(new_board):
-            if(predicts[0][best_index]<predicts[0][col]):
-                best_index=col
-        return best_index
 
+        predicts = self.model.predict([np.array([0]), new_board[None]])
+
+        # Re-rotate the board back to the original orientation for legal_moves
+        legal_moves = self.legal_moves(board)
+        
+        best_index = legal_moves[0]
+        for col in legal_moves:
+            if predicts[0][best_index] < predicts[0][col]:
+                best_index = col
+
+        return best_index
+    
+
+    def get_bot_move_classification2(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
+        rotated_board = np.rot90(board, k=1)
+
+        new_board = np.zeros((6, 7, 2), dtype=np.bool_)
+        for col in range(len(rotated_board)):
+            for j in range(len(rotated_board[col])):
+                if rotated_board[col][j] == 1:
+                    new_board[col][j][0] = True
+                if rotated_board[col][j] == 2:
+                    new_board[col][j][1] = True
+
+        fours_matrix = generate_output_matrix(new_board)
+        predicts = self.model.predict([np.array([0]), new_board[None], fours_matrix[None]])
+
+        # Re-rotate the board back to the original orientation for legal_moves
+        legal_moves = self.legal_moves(board)
+        
+        best_index = legal_moves[0]
+        for col in legal_moves:
+            if predicts[0][best_index] < predicts[0][col]:
+                best_index = col
+
+        return best_index
 
     def get_random_move(self, board: npt.NDArray[np.int8], turn: BoardFields) -> int:
         board = np.rot90(board, k=1)
